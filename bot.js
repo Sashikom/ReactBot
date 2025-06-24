@@ -1,66 +1,197 @@
 const TelegramBot = require('node-telegram-bot-api');
 
-// 🔐 Твой токен
-const token = '7780001573:AAGGLGO5V88dzrmOfRoif1nwu1sAMHUso3k';
+// 🔐 Токен бота
+const token = '7780001573:AAGNkwzV27rX4dLi1c_65InJeM6NgOWttJQ';
 const bot = new TelegramBot(token, { polling: true });
 
 console.log('🤖 Бот запущен...');
 
-// Главное меню с кнопками
+// Главное меню
 function mainMenu() {
   return {
     reply_markup: {
       inline_keyboard: [
         [{ text: '💼 Мои проекты', callback_data: 'projects' }],
-        [{ text: '💰 Стоимость услуг', callback_data: 'prices' }],
-        [{ text: '📲 Связаться со мной', callback_data: 'contact' }]
+        [{ text: '💰 Цены', callback_data: 'prices' }],
+        [{ text: '📲 Связаться', callback_data: 'contact' }]
       ]
     }
   };
 }
 
-// 💬 /start
-bot.onText(/\/start/, (msg) => {
+// /start — стартовое сообщение
+bot.onText(/\/start/, async (msg) => {
   const chatId = msg.chat.id;
+  const args = msg.text.split(' ')[1]; // Получаем параметр после /start
 
-  bot.sendMessage(chatId, `
-👋 Привет! Я бот Александра — разработчика сайтов и ботов из Беларуси.
+  if (!args) {
+    await bot.sendMessage(chatId, '👋 Привет! Я бот Александра. Выберите, что хотите узнать:', mainMenu());
+    return;
+  }
 
-Выбери, что тебе нужно:
-• Посмотреть мои работы
-• Узнать стоимость услуг
-• Написать мне напрямую
-
-📌 Жми на нужную кнопку.
-`, mainMenu());
+  // Обработка параметров из сайта
+  if (args === 'react-site') {
+    await bot.sendMessage(chatId, '🚀 Вы выбрали Vite + React сайт. Какой тип сайта вам нужен?\n\n1. Лендинг\n2. Портфолио\n3. CRM-панель', {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: '📝 Лендинг', callback_data: 'react-landing' }],
+          [{ text: '🎨 Портфолио', callback_data: 'react-portfolio' }],
+          [{ text: '📊 CRM', callback_data: 'react-crm' }],
+          [{ text: '⬅️ Назад', callback_data: 'back_to_menu' }]
+        ]
+      }
+    });
+  } else if (args === 'portfolio') {
+    await bot.sendMessage(chatId, '🎨 Вы выбрали сайт-портфолио. Какие работы показать?', {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: '🖼️ Дизайн', callback_data: 'portfolio-design' }],
+          [{ text: '🧩 UI/UX', callback_data: 'portfolio-ui' }],
+          [{ text: '🤖 Боты', callback_data: 'portfolio-bots' }],
+          [{ text: '⬅️ Назад', callback_data: 'back_to_menu' }]
+        ]
+      }
+    });
+  } else if (args === 'tg-bot') {
+    await bot.sendMessage(chatId, '🤖 Вы выбрали Telegram-бота. Какие функции нужны?', {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: '📋 Квиз', callback_data: 'tg-quiz' }],
+          [{ text: '✉️ Форма', callback_data: 'tg-form' }],
+          [{ text: '💬 Автоответчик', callback_data: 'tg-auto' }],
+          [{ text: '⬅️ Назад', callback_data: 'back_to_menu' }]
+        ]
+      }
+    });
+  } else if (args === 'ui-components') {
+    await bot.sendMessage(chatId, '🧩 Вы выбрали UI-компоненты. Какие нужны:\n\n1. Кнопки\n2. Модальные окна\n3. Формы', {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: '🔘 Кнопки', callback_data: 'ui-buttons' }],
+          [{ text: '📦 Модалки', callback_data: 'ui-modal' }],
+          [{ text: '📝 Формы', callback_data: 'ui-forms' }],
+          [{ text: '⬅️ Назад', callback_data: 'back_to_menu' }]
+        ]
+      }
+    });
+  } else if (args === 'form') {
+    await bot.sendMessage(chatId, '✉️ Вы выбрали контактную форму. Какие данные собирать?\n\n1. Имя + Email + Сообщение\n2. Телефон + Тема\n3. Полный профиль клиента', {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: '✍️ Минимальная', callback_data: 'form-min' }],
+          [{ text: '📄 Средняя', callback_data: 'form-mid' }],
+          [{ text: '📊 Полная', callback_data: 'form-full' }],
+          [{ text: '⬅️ Назад', callback_data: 'back_to_menu' }]
+        ]
+      }
+    });
+  } else {
+    await bot.sendMessage(chatId, '👋 Привет! Я бот Александра. Выберите, что хотите узнать:', mainMenu());
+  }
 });
 
-// 📁 Обработчик кнопок
-bot.on('callback_query', (query) => {
+// Обработка нажатия на кнопки
+bot.on('callback_query', async (query) => {
   const chatId = query.message.chat.id;
-  const data = query.data;
+  const messageId = query.message.message_id;
 
-  if (data === 'projects') {
-    bot.editMessageText(`📌 Вот некоторые из моих работ:\n\n1. Vite + React сайт — современный интерфейс\n2. CRM-панель — управление клиентами\n3. WhatsApp бот — автоматизация ответов\n4. Discord бот — модерация серверов`, {
+  if (query.data === 'projects') {
+    await bot.editMessageText(`📌 Вот мои проекты:\n\n1. Vite + React сайт — современный интерфейс\n2. CRM-панель — управление клиентами`, {
       chat_id: chatId,
-      message_id: query.message.message_id,
+      message_id: messageId,
       ...mainMenu()
     });
   }
 
-  if (data === 'prices') {
-    bot.editMessageText(`💰 Примерные цены:\n\n- Лендинг: от $50\n- Telegram-бот: от $70\n- WhatsApp интеграция: от $80\n- Дизайн + верстка: от $60 за страницу`, {
+  if (query.data === 'prices') {
+    await bot.editMessageText(`💰 Примерные цены:\n\n- Лендинг: от $50\n- Telegram-бот: от $70\n- WhatsApp интеграция: от $80`, {
       chat_id: chatId,
-      message_id: query.message.message_id,
+      message_id: messageId,
       ...mainMenu()
     });
   }
 
-  if (data === 'contact') {
-    bot.editMessageText(`📲 Свяжись со мной напрямую:\n\nTelegram: @alex_dev\nEmail: alex@example.com\nGitHub: github.com/alex-dev`, {
+  if (query.data === 'contact') {
+    await bot.editMessageText(
+      `📲 Свяжись со мной напрямую:\n\n` +
+      `Telegram: [https://t.me/maksahbot](https://t.me/maksahbot)\n`  +
+      `Email: [makalaleksandr@gmail.com](mailto:makalaleksandr@gmail.com)`,
+      {
+        chat_id: chatId,
+        message_id: messageId,
+        parse_mode: 'Markdown',
+        ...mainMenu()
+      }
+    );
+  }
+
+  if (query.data === 'back_to_menu') {
+    await bot.editMessageText('👋 Привет! Я бот Александра. Выберите, что хотите узнать:', {
       chat_id: chatId,
-      message_id: query.message.message_id,
+      message_id: messageId,
       ...mainMenu()
     });
+  }
+
+  // --- Подробности по услугам ---
+
+  if (query.data === 'react-landing') {
+    await bot.sendMessage(chatId, '📝 Лендинг — быстро, чётко, под ключ.\n\n👉 Отправьте тему сайта и целевую аудиторию.');
+  }
+
+  if (query.data === 'react-portfolio') {
+    await bot.sendMessage(chatId, '🎨 Сайт-портфолио — покажу ваши работы красиво и удобно.\n\n👉 Пришлите примеры своих проектов.');
+  }
+
+  if (query.data === 'react-crm') {
+    await bot.sendMessage(chatId, '📊 CRM-панель — управление заказами и клиентами.\n\n👉 Опишите вашу систему управления.');
+  }
+
+  if (query.data === 'tg-quiz') {
+    await bot.sendMessage(chatId, '📋 Квиз — собираю задачу через вопросы.\n\n👉 Расскажите, какие услуги вы предлагаете.');
+  }
+
+  if (query.data === 'tg-form') {
+    await bot.sendMessage(chatId, '✉️ Форма связи — работает через сайт.\n\n👉 Нужно ли добавить её к вам на страницу?');
+  }
+
+  if (query.data === 'tg-auto') {
+    await bot.sendMessage(chatId, '💬 Автоответчик — отвечает за вас.\n\n👉 Какие шаблоны ответов использовать?');
+  }
+
+  if (query.data === 'form-min') {
+    await bot.sendMessage(chatId, '✍️ Минимальная форма:\n\nИмя + Email + Сообщение\n\n👉 Хотите её внедрить на сайт?');
+  }
+
+  if (query.data === 'form-mid') {
+    await bot.sendMessage(chatId, '📄 Средняя форма:\n\nИмя + Телефон + Тема + Сообщение\n\n👉 Подходит для фрилансеров.');
+  }
+
+  if (query.data === 'form-full') {
+    await bot.sendMessage(chatId, '📊 Полная форма:\n\nИмя + Email + Телефон + Задача + Бюджет\n\n👉 Для серьёзных проектов.');
+  }
+
+  if (query.data === 'ui-buttons') {
+    await bot.sendMessage(chatId, '🔘 Кнопки — стильные, адаптивные, переиспользуемые.\n\n👉 Нужны ли вам кнопки для сайта или приложения?');
+  }
+
+  if (query.data === 'ui-modal') {
+    await bot.sendMessage(chatId, '📦 Модальные окна — для форм, уведомлений, диалогов.\n\n👉 Нужны ли они в ваш проект?');
+  }
+
+  if (query.data === 'ui-forms') {
+    await bot.sendMessage(chatId, '📝 Формы — логин, регистрация, заявка.\n\n👉 Какие поля должны быть в форме?');
+  }
+
+  if (query.data === 'portfolio-design') {
+    await bot.sendMessage(chatId, '🖼️ Дизайн — можно сделать через Canva или Figma.\n\n👉 У вас есть свои материалы?');
+  }
+
+  if (query.data === 'portfolio-ui') {
+    await bot.sendMessage(chatId, '🧩 UI/UX — компоненты для сайтов и приложений.\n\n👉 Какие именно элементы вам нужны?');
+  }
+
+  if (query.data === 'portfolio-bots') {
+    await bot.sendMessage(chatId, '🤖 Боты — можно создать под любую задачу.\n\n👉 Какой тип бота вам нужен?');
   }
 });
