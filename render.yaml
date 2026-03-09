@@ -1,5 +1,5 @@
 services:
-  - type: web
+  - type: worker        # ✅ ВАЖНО: worker, а не web!
     name: reactbot
     env: node
     buildCommand: npm install
