@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: reactbot-telegram-bot
+    env: node
+    region: frankfurt
+    plan: free
+    buildCommand: npm install
+    startCommand: node bot/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: BOT_TOKEN
+        sync: false
