@@ -5,7 +5,7 @@ function mainMenu() {
       inline_keyboard: [
         [{ text: '💼 Мои проекты', callback_data: 'projects' }],
         [{ text: '💰 Цены', callback_data: 'prices' }],
-        [{ text: '🌐 Портфолио', url: 'https://твой-сайт.com' }],
+        [{ text: '🌐 Портфолио', url: 'https://darling-genie-9f2976.netlify.app/#projects' }],
         [{ text: '📲 Связаться', callback_data: 'contact' }]
       ]
     }
@@ -21,7 +21,7 @@ function serviceMenu() {
         [{ text: '🎨 Портфолио', callback_data: 'service_portfolio' }],
         [{ text: '📊 CRM-панель', callback_data: 'service_crm' }],
         [{ text: '🤖 Telegram-бот', callback_data: 'service_bot' }],
-        [{ text: '❌ Отмена', callback_data: 'cancel' }]
+        [{ text: ' Отмена', callback_data: 'cancel' }]
       ]
     }
   };

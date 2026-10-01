@@ -6,10 +6,7 @@ const { STATES, setUserState, getUserState, clearUserState, isState } = require(
 const { isValidEmail, getUserName } = require('./utils');
 
 // Проверка токена
-if (!process.env.BOT_TOKEN) {
-  console.error('❌ BOT_TOKEN не найден в .env!');
-  process.exit(1);
-}
+
 
 const token = process.env.BOT_TOKEN;
 const bot = new TelegramBot(token, { polling: true });
@@ -24,7 +21,7 @@ function mainMenu() {
         [{ text: '💼 Мои проекты', callback_data: 'projects' }],
         [{ text: '💰 Цены', callback_data: 'prices' }],
         [{ text: '📝 Заказать услугу', callback_data: 'order_service' }],
-        [{ text: '🌐 Портфолио', url: 'https://portfolio-alex-olive.vercel.app/#projects' }],
+        [{ text: '🌐 Портфолио', url: 'https://darling-genie-9f2976.netlify.app/#projects' }],
         [{ text: '📲 Связаться', callback_data: 'contact' }]
       ]
     }
@@ -199,26 +196,55 @@ bot.on('callback_query', async (query) => {
   }
 
   if (query.data === 'prices') {
-    await bot.editMessageText(`💰 Примерные цены:\n\n- Лендинг: от $50-150 💸\n- Сайт-портфолио: от $100-300 🎨\n- Telegram-бот: от $70-200 🤖\n- CRM-панель: от $150-500 📊\n- UI-компоненты: от $30-100 🧩\n\n⚠️ Точная цена зависит от сложности задачи.`, {
+    await bot.editMessageText(`💰 Актуальные цены на разработку:\n\n Лендинг / Сайт-визитка: от 150 BYN\n🎨 Сайт-портфолио: от 250 BYN\n🤖 Telegram-бот (базовый/сложный): от 200 BYN\n📊 CRM-панель / Админка: от 400 BYN\n UI/UX компоненты: от 100 BYN\n\n⚠️ Точная стоимость зависит от ТЗ. Напишите мне, обсудим детали!`, {
       chat_id: chatId,
       message_id: messageId,
       ...mainMenu()
     });
   }
 
-  if (query.data === 'contact') {
-    await bot.editMessageText(
-      `📲 Свяжись со мной напрямую:\n\n` +
-      `🌐 Портфолио: [Посмотреть работы](https://portfolio-alex-olive.vercel.app/#projects)` +
-      `Telegram: [@maksahbot](https://t.me/maksahbot)\n` +
-      `Email: [makalaleksandr@gmail.com](mailto:makalaleksandr@gmail.com)`,
-      {
-        chat_id: chatId,
-        message_id: messageId,
-        parse_mode: 'Markdown',
-        ...mainMenu()
+    if (query.data === 'contact') {
+    const contactText = 
+` *Свяжись со мной напрямую!*
+
+Я всегда на связи и готов обсудить твой проект.
+
+️ *Email:* 
+\`makalaleksandr@gmail.com\`
+
+💬 *Telegram:* 
+@MaqBobot`;
+
+    const options = {
+      chat_id: query.message.chat.id,
+      message_id: query.message.message_id,
+      parse_mode: 'Markdown',
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: '🌐 Открыть Портфолио', url: 'https://darling-genie-9f2976.netlify.app/#projects' }
+          ],
+          [
+            { text: '💬 Написать мне в Telegram', url: 'https://t.me/MaqBobot' }
+          ],
+          [
+            { text: '⬅️ Назад в главное меню', callback_data: 'back_to_menu' } // ВОТ ЭТА СТРОКА!
+          ]
+        ]
       }
-    );
+    };
+
+    try {
+      await bot.editMessageText(contactText, options);
+    } catch (error) {
+      if (error.description && error.description.includes('message is not modified')) {
+        console.log('✅ Сообщение уже актуально.');
+      } else {
+        console.error('❌ Ошибка редактирования:', error);
+      }
+    }
+    
+    await bot.answerCallbackQuery(query.id); 
   }
 
   if (query.data === 'back_to_menu') {

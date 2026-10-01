@@ -1,7 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 
 // 🔐 Токен бота
-const token = '7780001573:AAGNkwzV27rX4dLi1c_65InJeM6NgOWttJQ';
+const token = '8813807927:AAFNWSAZjqEC_CnRSN8YoIA0gBxFAbvz55A';
 const bot = new TelegramBot(token, { polling: true });
 
 console.log('🤖 Бот запущен...');
@@ -104,7 +104,7 @@ bot.on('callback_query', async (query) => {
   }
 
   if (query.data === 'prices') {
-    await bot.editMessageText(`💰 Примерные цены:\n\n- Лендинг: от $50\n- Telegram-бот: от $70\n- WhatsApp интеграция: от $80`, {
+    await bot.editMessageText(`💰 Примерные цены:\n\n- Лендинг: от 150 BYN\n- Telegram-бот: от 200 BYN\n- WhatsApp интеграция: от 230 BYN`, {
       chat_id: chatId,
       message_id: messageId,
       ...mainMenu()
@@ -112,18 +112,48 @@ bot.on('callback_query', async (query) => {
   }
 
   if (query.data === 'contact') {
-    await bot.editMessageText(
-      `📲 Свяжись со мной напрямую:\n\n` +
-      `Telegram: [https://t.me/maksahbot](https://t.me/maksahbot)\n`  +
-      `Email: [makalaleksandr@gmail.com](mailto:makalaleksandr@gmail.com)`,
-      {
-        chat_id: chatId,
-        message_id: messageId,
-        parse_mode: 'Markdown',
-        ...mainMenu()
+    const contactText = 
+` *Свяжись со мной напрямую!*
+
+Я всегда на связи и готов обсудить твой проект.
+
+️ *Email:* 
+\`makalaleksandr@gmail.com\`
+
+💬 *Telegram:* 
+@MaqBobot`;
+
+    const options = {
+      chat_id: query.message.chat.id,
+      message_id: query.message.message_id,
+      parse_mode: 'Markdown',
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: '🌐 Открыть Портфолио', url: 'https://darling-genie-9f2976.netlify.app/#projects' }
+          ],
+          [
+            { text: '💬 Написать мне в Telegram', url: 'https://t.me/MaqBobot' }
+          ],
+          [
+            { text: '⬅️ Назад в главное меню', callback_data: 'back_to_menu' } // ВОТ ЭТА СТРОКА!
+          ]
+        ]
       }
-    );
-  }
+    };
+
+    try {
+      await bot.editMessageText(contactText, options);
+    } catch (error) {
+      if (error.description && error.description.includes('message is not modified')) {
+        console.log('✅ Сообщение уже актуально.');
+      } else {
+        console.error('❌ Ошибка редактирования:', error);
+      }
+    }
+    
+    await bot.answerCallbackQuery(query.id); 
+  }      
 
   if (query.data === 'back_to_menu') {
     await bot.editMessageText('👋 Привет! Я бот Александра. Выберите, что хотите узнать:', {
