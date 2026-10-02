@@ -219,16 +219,22 @@ bot.on('callback_query', async (query) => {
       chat_id: query.message.chat.id,
       message_id: query.message.message_id,
       parse_mode: 'Markdown',
-      reply_markup: {
+            reply_markup: {
         inline_keyboard: [
           [
             { text: '🌐 Открыть Портфолио', url: 'https://darling-genie-9f2976.netlify.app/#projects' }
           ],
           [
-            { text: '💬 Написать мне в Telegram', url: 'https://t.me/MaqBobot' }
+            { text: '🤖 AI Automaton Lab', url: 'https://t.me/Automaton_Lab' }
           ],
           [
-            { text: '⬅️ Назад в главное меню', callback_data: 'back_to_menu' } // ВОТ ЭТА СТРОКА!
+            { text: '✍️ Пишем-чтоб платили', url: 'https://t.me/aleksazasr' }
+          ],
+          [
+            { text: '💬 Написать мне лично', url: 'https://t.me/MaqBobot' }
+          ],
+          [
+            { text: '⬅️ Назад в главное меню', callback_data: 'back_to_menu' }
           ]
         ]
       }
@@ -406,7 +412,7 @@ bot.on('message', async (msg) => {
       `💼 <b>Услуга:</b> ${order.service.title}\n` +
       `📧 <b>Email:</b> ${order.email}\n\n` +
       `💬 Я свяжусь с вами в ближайшее время!\n` +
-      `Если срочно — пишите в личные сообщения: @maksahbot`,
+      `Если срочно — пишите в личные сообщения: @MaqBobot`,
       {
         parse_mode: 'HTML',
         ...mainMenu()

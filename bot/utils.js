@@ -14,9 +14,10 @@ function escapeMarkdown(text) {
   return text.replace(/[_*[\]()~`>#+\-=|{}.!]/g, '\\$&');
 }
 
-// Валидация email
+// Валидация email (автоматически удаляет пробелы)
 function isValidEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const cleanEmail = email.replace(/\s+/g, ''); // Удаляем все пробелы из строки
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail);
 }
 
 // Получение имени пользователя
